@@ -69,6 +69,7 @@ class LeaguesPage extends Page {
         await this.inputSportName.waitForEnabled({ timeout: 10000 });
         await this.inputSportName.setValue(sportName);
         await browser.pause(2000);
+        
 
         await this.formatDropdown.waitForClickable({ timeout: 10000 });
         await this.formatDropdown.click();
