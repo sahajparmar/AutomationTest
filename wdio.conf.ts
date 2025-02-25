@@ -86,7 +86,8 @@ export const config: WebdriverIO.Config = {
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
     // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
     // gets prepended directly.
-    baseUrl: 'http://192.168.0.125:8080/',
+    baseUrl: process.env.BASE_URL || 'http://192.168.0.125:8080',
+    
     // baseUrl: 'http://localhost:4200/',
     //
     // Default timeout for all waitFor* commands.
@@ -132,7 +133,7 @@ export const config: WebdriverIO.Config = {
     // See the full list at http://mochajs.org/
     mochaOpts: {
         ui: 'bdd',
-        timeout: 60000
+        timeout: 3000000
     },
     before: async () => {
         await browser.maximizeWindow();

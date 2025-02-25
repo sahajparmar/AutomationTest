@@ -17,16 +17,40 @@ class LeaguesPage extends Page {
         return browser.$('(//*[@role="combobox"])[1]');
     }
 
-    public get formatOption() {
+    public get formatOptionRoundRobin() {
+        return browser.$('(//*[@class="mdc-list-item__primary-text"])[1]');
+    }
+
+    public get formatOptionKnockout() {
         return browser.$('(//*[@class="mdc-list-item__primary-text"])[2]');
     }
 
-    public get eventTypeRadioButton() {
-        return browser.$('(//*[@name="mat-radio-group-0"])[1]');
+    public get eventTypeRadioButton1() {
+        return browser.$('(//*[@class="mdc-radio__native-control"])[1]');
     }
 
-    public get divisionCheckbox() {
-        return browser.$('(//*[@class="mdc-checkbox"])');
+    public get eventTypeRadioButton2() {
+        return browser.$('(//*[@class="mdc-radio__native-control"])[2]');
+    }
+
+    public get divisionCheckbox1() {
+        return browser.$('(//*[@class="mdc-checkbox"])[1]');
+    }
+
+    public get divisionCheckbox2() {
+        return browser.$('(//*[@class="mdc-checkbox"])[2]');
+    }
+
+    public get divisionCheckbox3() {
+        return browser.$('(//*[@class="mdc-checkbox"])[3]');
+    }
+
+    public get divisionCheckbox4() {
+        return browser.$('(//*[@class="mdc-checkbox"])[4]');
+    }
+
+    public get divisionCheckbox5() {
+        return browser.$('(//*[@class="mdc-checkbox"])[5]');
     }
 
     public get playersInput() {
@@ -37,16 +61,30 @@ class LeaguesPage extends Page {
         return browser.$('(//*[@class="mat-mdc-button-touch-target"])[3]');
     }
 
-    public get clickonstartDate() {
-        return browser.$('(//*[@aria-label="February 27, 2025"])');
+    public get nextMonthButton() {
+        return browser.$('(//*[@class="mat-calendar-next-button mdc-icon-button mat-mdc-icon-button mat-unthemed mat-mdc-button-base"])');
     }
 
     public get endDateCalendarButton() {
         return browser.$('(//*[@class="mat-mdc-button-touch-target"])[4]');
     }
 
-    public get clickonEndDate() {
-        return browser.$('(//*[@aria-label="February 28, 2025"])');
+    public async selectDate(date: string) {
+        const dateSelector = `//*[@aria-label="${date}"]`;
+        let dateElement = await browser.$(dateSelector);
+
+        // Navigate to the correct month if the date is not found
+        while (!(await dateElement.isExisting())) {
+            await this.nextMonthButton.waitForClickable({ timeout: 10000 });
+            await this.nextMonthButton.click();
+            await browser.pause(1000);
+            dateElement = await browser.$(dateSelector);
+        }
+
+        await dateElement.scrollIntoView();
+        await dateElement.waitForClickable({ timeout: 10000 });
+        await dateElement.click();
+        await browser.pause(2000);
     }
 
     public get submitButton() {
@@ -57,7 +95,7 @@ class LeaguesPage extends Page {
         return super.open('app/leagues');
     }
 
-    public async createLeague(leagueName: string, sportName: string) {
+    public async createLeague(leagueName: string, sportName: string, formatOptionIndex: number, eventTypeIndex: number, checkboxes: number[], players: number, startDate: string, endDate: string) {
         await this.createLeagueButton.waitForClickable({ timeout: 10000 });
         await this.createLeagueButton.click();
         await browser.pause(2000);
@@ -69,59 +107,63 @@ class LeaguesPage extends Page {
         await this.inputSportName.waitForEnabled({ timeout: 10000 });
         await this.inputSportName.setValue(sportName);
         await browser.pause(2000);
-        
 
         await this.formatDropdown.waitForClickable({ timeout: 10000 });
         await this.formatDropdown.click();
         await browser.pause(2000);
 
-        await this.formatOption.waitForClickable({ timeout: 10000 });
-        await this.formatOption.click();
+        if (formatOptionIndex === 1) {
+            await this.formatOptionRoundRobin.waitForClickable({ timeout: 10000 });
+            await this.formatOptionRoundRobin.click();
+        } else {
+            await this.formatOptionKnockout.waitForClickable({ timeout: 10000 });
+            await this.formatOptionKnockout.click();
+        }
         await browser.pause(2000);
 
-        await (await this.eventTypeRadioButton).waitForDisplayed({ timeout: 15000 });
-        await browser.pause(1000); // brief pause if rendering is slow
-        await (await this.eventTypeRadioButton).click();
+        if (eventTypeIndex === 1) {
+            await this.eventTypeRadioButton1.waitForDisplayed({ timeout: 15000 });
+            await browser.pause(1000); // brief pause if rendering is slow
+            await this.eventTypeRadioButton1.click();
+        } else {
+            await this.eventTypeRadioButton2.waitForDisplayed({ timeout: 15000 });
+            await browser.pause(1000); // brief pause if rendering is slow
+            await this.eventTypeRadioButton2.click();
+        }
         await browser.pause(1000);
 
-        await this.divisionCheckbox.waitForClickable({ timeout: 10000 });
-        await this.divisionCheckbox.click();
-        await browser.pause(2000);
+        for (const checkboxIndex of checkboxes) {
+            const checkbox = await browser.$(`(//*[@class="mdc-checkbox"])[${checkboxIndex}]`);
+            await checkbox.waitForClickable({ timeout: 10000 });
+            await checkbox.click();
+            await browser.pause(1000);
+        }
 
         await this.playersInput.waitForEnabled({ timeout: 10000 });
-        await this.playersInput.setValue(5);
+        await this.playersInput.setValue(players);
         await browser.pause(2000);
-        await this.eventTypeRadioButton.scrollIntoView();
-
 
         await this.startDateCalendarButton.scrollIntoView();
         await this.startDateCalendarButton.waitForClickable({ timeout: 10000 });
         await this.startDateCalendarButton.click();
         await browser.pause(2000);
 
-        await this.clickonstartDate.scrollIntoView();
-        await this.clickonstartDate.waitForClickable({ timeout: 10000 });
-        await this.clickonstartDate.click();
-        await browser.pause(2000);
+        await this.selectDate(startDate);
 
         await this.endDateCalendarButton.scrollIntoView();
         await this.endDateCalendarButton.waitForClickable({ timeout: 10000 });
         await this.endDateCalendarButton.click();
         await browser.pause(2000);
 
-        await this.clickonEndDate.scrollIntoView();
-        await this.clickonEndDate.waitForClickable({ timeout: 10000 });
-        await this.clickonEndDate.click();
-        await browser.pause(2000);
-
+        await this.selectDate(endDate);
 
         await this.submitButton.waitForClickable({ timeout: 10000 });
         await this.submitButton.click();
         await browser.pause(2000);
+
+        
+        await browser.url(`${browser.options.baseUrl}/app/leagues`);
     }
 }
 
 export default new LeaguesPage();
-
-
-

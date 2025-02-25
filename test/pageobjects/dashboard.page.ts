@@ -1,34 +1,31 @@
 import Page from './page';
 
-/**
- * sub page containing specific selectors and methods for a specific page
- */
+
+    //sub page containing specific selectors and methods for a specific page
+ 
 class DashboardPage extends Page {
-    /**
-     * define selectors using getter methods
-     */
+    
+     // define selectors using getter methods
+     
     public get profileIcon() {
-        return browser.$('(//*[@class="mat-mdc-button-touch-target"])[1]');
+        return browser.$('//*[@class="mat-mdc-menu-trigger mdc-icon-button mat-mdc-icon-button mat-unthemed mat-mdc-button-base"]');
     }
 
     public get signOutButton() {
         return browser.$('(//*[@class="mat-mdc-menu-item-text"])[3]');
     }
-
     public get leaguesLink() {
         return browser.$('//a[span[text()="Leagues"]]');
     }
 
-    /**
-     * overwrite specific options to adapt it to page object
-     */
+    //overwrite specific options to adapt it to page object
+     
     public open() {
         return super.open('app/dashboard');
     }
 
-    /**
-     * method to sign out from the application
-     */
+    //method to sign out from the application
+     
     public async signOut() {
         await this.profileIcon.click();
         await browser.pause(2000);
@@ -36,9 +33,8 @@ class DashboardPage extends Page {
         await browser.pause(2000);
     }
 
-    /**
-     * method to navigate to leagues page
-     */
+    //method to navigate to leagues page
+     
     public async navigateToLeagues() {
         await this.leaguesLink.click();
         await browser.pause(2000);
